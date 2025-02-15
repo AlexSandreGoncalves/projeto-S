@@ -1,0 +1,87 @@
+import sqlite3
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+def conectar_bd():
+    try:
+        conexao = sqlite3.connect("peças.db")
+        return conexao
+    except sqlite3.Error as e:
+        messagebox.showerror("Erro", f"Erro ao conectar ao banco de dados: {e}")
+        return None
+
+def carregar_dados(cod_peca=None):
+    conexao = conectar_bd()
+    if not conexao:
+        return
+    
+    cursor = conexao.cursor()
+    try:
+        if cod_peca:
+            cursor.execute("SELECT cod_peca, comprimento, largura FROM pecas WHERE cod_peca = ?", (cod_peca,))
+            dado = cursor.fetchone()
+            if dado:
+                entry_comprimento.delete(0, tk.END)
+                entry_comprimento.insert(0, dado[1])
+                entry_largura.delete(0, tk.END)
+                entry_largura.insert(0, dado[2])
+                atualizar_tabela([dado])
+            else:
+                messagebox.showinfo("Info", "Nenhuma peça encontrada com esse código.")
+        else:
+            cursor.execute("SELECT cod_peca, comprimento, largura FROM pecas")
+            dados = cursor.fetchall()
+            atualizar_tabela(dados)
+    except sqlite3.Error as e:
+        messagebox.showerror("Erro", f"Erro ao buscar dados: {e}")
+    finally:
+        conexao.close()
+
+def atualizar_tabela(dados):
+    for row in tree.get_children():
+        tree.delete(row)
+    for dado in dados:
+        tree.insert("", "end", values=dado)
+
+def buscar_por_codigo():
+    cod_peca = entry_codigo.get()
+    carregar_dados(cod_peca)
+
+def criar_interface():
+    global tree, entry_codigo, entry_comprimento, entry_largura
+    root = tk.Tk()
+    root.title("Consulta de Peças")
+    root.geometry("500x400")
+    
+    frame = tk.Frame(root)
+    frame.pack(pady=10)
+    
+    tk.Label(root, text="Código da Peça:").pack()
+    entry_codigo = tk.Entry(root)
+    entry_codigo.pack()
+    
+    btn_buscar = tk.Button(root, text="Medidas", command=buscar_por_codigo)
+    btn_buscar.pack(pady=5)
+    
+    tk.Label(root, text="Comprimento:").pack()
+    entry_comprimento = tk.Entry(root)
+    entry_comprimento.pack()
+    
+    tk.Label(root, text="Largura:").pack()
+    entry_largura = tk.Entry(root)
+    entry_largura.pack()
+    
+    tree = ttk.Treeview(frame, columns=("Código", "Comprimento", "Largura"), show="headings")
+    tree.heading("Código", text="Código")
+    tree.heading("Comprimento", text="Comprimento")
+    tree.heading("Largura", text="Largura")
+    
+    tree.pack()
+    
+    btn_carregar = tk.Button(root, text="Carregar Todos", command=carregar_dados)
+    btn_carregar.pack(pady=10)
+    
+    root.mainloop()
+
+if __name__ == "__main__":
+    criar_interface()

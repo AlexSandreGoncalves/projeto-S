@@ -1,0 +1,20 @@
+projeto/
+├── .github/
+│   └── workflows/
+│       └── ci.yml  # Configuração do GitHub Actions
+├── ui/
+│   ├── canvas.py          # Lógica do canvas
+│   ├── polygon_creator.py # Lógica de criação de polígonos
+│   ├── toolbar_extended.py # Barra de ferramentas estendida
+│   └── toolbar_base.py     # Barra de ferramentas básica
+├── logic/
+│   ├── object_manager.py # Gerenciador de objetos
+│   ├── polygon_logic.py  # Lógica centralizada para manipulação de polígonos
+│   └── utils.py          # Funções utilitárias
+├── rendering/
+│   └── renderer.py       # Renderizador de objetos
+├── tests/
+│   ├── test_canvas.py    # Testes para o canvas
+│   └── test_polygon_creator.py # Testes para criação de polígonos
+├── requirements.txt      # Dependências do projeto
+└── main.py               # Ponto de entrada do aplicativo
